@@ -50,7 +50,8 @@ class GeographicPlotDisplay(Display):
                 lon_field='lon', dsname=None, cbar_label=None, title=None,
                 projection=ccrs.PlateCarree(), plot_buffer=0.08,
                 stamen='terrain-background', tile=8, cartopy_feature=None,
-                cmap='rainbow', text=None, gridlines=True, **kwargs):
+                cmap='rainbow', text=None, gridlines=True, resolution='110m',
+                **kwargs):
         """
         Creates a latttude and longitude plot of a time series data set with
         data values indicated by color and described with a colorbar.
@@ -92,6 +93,9 @@ class GeographicPlotDisplay(Display):
             than one set of text to add.
         gridlines: boolean
             Use latitude and longitude gridlines.
+        resolution: str
+            Resolution of NaturalEarthFeatures to use. See cartopy
+            documentation for details.
         **kwargs: keyword arguments
             Any other keyword arguments that will be passed
             into :func:`matplotlib.pyplot.scatter` when the figure
@@ -152,14 +156,14 @@ class GeographicPlotDisplay(Display):
                       lat_center + box_size / 2. + bx_buf]
         lon_limits = [lon_center - box_size / 2. - bx_buf,
                       lon_center + box_size / 2. + bx_buf]
-
+        
         data = self._arm[dsname][data_field].values
 
         # Create base plot projection
         ax = plt.axes(projection=projection)
         plt.subplots_adjust(left=0.01, right=0.99, bottom=0.05, top=0.93)
         ax.set_extent([lon_limits[0], lon_limits[1], lat_limits[0],
-                       lat_limits[1]], crs=projection)
+                       lat_limits[1]], crs=ccrs.PlateCarree())
 
         if title is None:
             try:
@@ -188,33 +192,35 @@ class GeographicPlotDisplay(Display):
                 cartopy_feature = [cartopy_feature]
             cartopy_feature = [ii.upper() for ii in cartopy_feature]
             if 'STATES' in cartopy_feature:
-                ax.add_feature(cfeature.STATES.with_scale('10m'))
+                ax.add_feature(cfeature.STATES.with_scale(resolution))
             if 'LAND' in cartopy_feature:
-                ax.add_feature(cfeature.LAND)
+                ax.add_feature(cfeature.LAND.with_scale(resolution))
             if 'OCEAN' in cartopy_feature:
-                ax.add_feature(cfeature.OCEAN)
+                ax.add_feature(cfeature.OCEAN.with_scale(resolution))
             if 'COASTLINE' in cartopy_feature:
-                ax.add_feature(cfeature.COASTLINE)
+                ax.add_feature(cfeature.COASTLINE.with_scale(resolution))
             if 'BORDERS' in cartopy_feature:
-                ax.add_feature(cfeature.BORDERS, linestyle=':')
+                ax.add_feature(cfeature.BORDERS.with_scale(resolution),
+                               linestyle=':')
             if 'LAKES' in cartopy_feature:
-                ax.add_feature(cfeature.LAKES, alpha=0.5)
+                ax.add_feature(cfeature.LAKES.with_scale(resolution),
+                               alpha=0.5)
             if 'RIVERS' in cartopy_feature:
-                ax.add_feature(cfeature.RIVERS)
+                ax.add_feature(cfeature.RIVERS.with_scale(resolution))
         if text is not None:
             for label, location in text.items():
                 ax.plot(location[0], location[1], marker='*', color='black')
                 ax.text(location[0], location[1], label, color='black')
 
         if gridlines:
-            gl = ax.gridlines(crs=ccrs.PlateCarree(), draw_labels=True,
+            gl = ax.gridlines(draw_labels=True,
                               linewidth=1, color='gray', alpha=0.5,
                               linestyle='--')
             gl.xlabels_top = False
             gl.ylabels_left = True
             gl.xlabels_bottom = True
             gl.ylabels_right = False
-            gl.xlabel_style = {'size': 6, 'color': 'gray'}
-            gl.ylabel_style = {'size': 6, 'color': 'gray'}
+            gl.xlabel_style = {'size': 12, 'color': 'gray'}
+            gl.ylabel_style = {'size': 12, 'color': 'gray'}
 
         return ax
