@@ -51,7 +51,7 @@ class GeographicPlotDisplay(Display):
                 projection=ccrs.PlateCarree(), plot_buffer=0.08,
                 stamen='terrain-background', tile=8, cartopy_feature=None,
                 cmap='rainbow', text=None, gridlines=True, resolution='110m',
-                **kwargs):
+                size=6, color='gray', **kwargs):
         """
         Creates a latttude and longitude plot of a time series data set with
         data values indicated by color and described with a colorbar.
@@ -96,6 +96,10 @@ class GeographicPlotDisplay(Display):
         resolution: str
             Resolution of NaturalEarthFeatures to use. See cartopy
             documentation for details.
+        size: int
+            Size of the axes text labels.
+        color: str
+            Matplotlib color to used to color axes label text.
         **kwargs: keyword arguments
             Any other keyword arguments that will be passed
             into :func:`matplotlib.pyplot.scatter` when the figure
@@ -214,13 +218,13 @@ class GeographicPlotDisplay(Display):
 
         if gridlines:
             gl = ax.gridlines(draw_labels=True,
-                              linewidth=1, color='gray', alpha=0.5,
-                              linestyle='--')
+                              linewidth=1, color=color, alpha=0.5,
+                              linestyle=':')
             gl.xlabels_top = False
             gl.ylabels_left = True
             gl.xlabels_bottom = True
             gl.ylabels_right = False
-            gl.xlabel_style = {'size': 12, 'color': 'gray'}
-            gl.ylabel_style = {'size': 12, 'color': 'gray'}
+            gl.xlabel_style = {'size': size, 'color': color}
+            gl.ylabel_style = {'size': size, 'color': color}
 
         return ax
