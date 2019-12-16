@@ -160,7 +160,7 @@ class GeographicPlotDisplay(Display):
                       lat_center + box_size / 2. + bx_buf]
         lon_limits = [lon_center - box_size / 2. - bx_buf,
                       lon_center + box_size / 2. + bx_buf]
-        
+
         data = self._arm[dsname][data_field].values
 
         # Create base plot projection
